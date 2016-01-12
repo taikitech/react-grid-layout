@@ -1,5 +1,6 @@
 'use strict';
 var React = require('react');
+var ReactDOM = require('react-dom');
 require('style!css!../css/styles.css');
 require('style!css!../examples/example-styles.css');
 require('style!css!../node_modules/react-resizable/css/styles.css');
@@ -9,7 +10,7 @@ module.exports = function(Layout) {
   document.addEventListener("DOMContentLoaded", function(event) { 
     var contentDiv = document.getElementById('content');
     var gridProps = window.gridProps || {};
-    React.render(React.createElement(ExampleLayout, gridProps), contentDiv);
+    ReactDOM.render(React.createElement(ExampleLayout, gridProps), contentDiv);
   });
 
   var ExampleLayout = React.createClass({
