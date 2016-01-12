@@ -1,62 +1,63 @@
+/**
+ * Copyright 2013-2015, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @typechecks static-only
+ * @providesModule cloneWithProps
+ */
+
 'use strict';
-var React = require('react'),
-    hasOwn = Object.prototype.hasOwnProperty,
-    version = React.version.split('.').map(parseFloat),
-    RESERVED = {
-  className: resolve(joinClasses),
-  children: function children() {},
-  key: function key() {},
-  ref: function ref() {},
-  style: resolve(extend)
-};
 
-module.exports = function cloneWithProps(child, props) {
-  var newProps = mergeProps(props, child.props);
+var React = require('react');
+var ReactPropTransferer = require('./PropTransfer');
 
-  if (!hasOwn.call(newProps, 'children') && hasOwn.call(child.props, 'children')) newProps.children = child.props.children;
-
-  // < 0.11
-  if (version[0] === 0 && version[1] < 11) return child.constructor.ConvenienceConstructor(newProps);
-
-  // 0.11
-  if (version[0] === 0 && version[1] === 11) return child.constructor(newProps);
-
-  // 0.12
-  else if (version[0] === 0 && version[1] === 12) {
-      MockLegacyFactory.isReactLegacyFactory = true;
-      MockLegacyFactory.type = child.type;
-      return React.createElement(MockLegacyFactory, newProps);
+var keyOf = function keyOf(oneKeyObj) {
+  var key;
+  for (key in oneKeyObj) {
+    if (!oneKeyObj.hasOwnProperty(key)) {
+      continue;
     }
-
-  // 0.13+
-  return React.createElement(child.type, newProps);
-
-  function MockLegacyFactory() {}
-};
-
-function mergeProps(currentProps, childProps) {
-  var newProps = extend(currentProps),
-      key;
-
-  for (key in childProps) {
-    if (hasOwn.call(RESERVED, key)) RESERVED[key](newProps, childProps[key], key);else if (!hasOwn.call(newProps, key)) newProps[key] = childProps[key];
+    return key;
   }
-  return newProps;
+  return null;
+};
+var warning = console.warn;
+
+var CHILDREN_PROP = keyOf({ children: null });
+
+var didDeprecatedWarn = false;
+
+/**
+ * Sometimes you want to change the props of a child passed to you. Usually
+ * this is to add a CSS class.
+ *
+ * @param {ReactElement} child child element you'd like to clone
+ * @param {object} props props you'd like to modify. className and style will be
+ * merged automatically.
+ * @return {ReactElement} a clone of child with props merged in.
+ * @deprecated
+ */
+function cloneWithProps(child, props) {
+  if (process.env.NODE_ENV !== 'production') {
+    process.env.NODE_ENV !== 'production' ? warning(didDeprecatedWarn, 'cloneWithProps(...) is deprecated. ' + 'Please use React.cloneElement instead.') : undefined;
+    didDeprecatedWarn = true;
+    process.env.NODE_ENV !== 'production' ? warning(!child.ref, 'You are calling cloneWithProps() on a child with a ref. This is ' + 'dangerous because you\'re creating a new child which will not be ' + 'added as a ref to its parent.') : undefined;
+  }
+
+  var newProps = ReactPropTransferer.mergeProps(props, child.props);
+
+  // Use `child.props.children` if it is provided.
+  if (!newProps.hasOwnProperty(CHILDREN_PROP) && child.props.hasOwnProperty(CHILDREN_PROP)) {
+    newProps.children = child.props.children;
+  }
+
+  // The current API doesn't retain _owner, which is why this
+  // doesn't use ReactElement.cloneAndReplaceProps.
+  return React.createElement(child.type, newProps);
 }
 
-function resolve(fn) {
-  return function (src, value, key) {
-    if (!hasOwn.call(src, key)) src[key] = value;else src[key] = fn(src[key], value);
-  };
-}
-
-function joinClasses(a, b) {
-  if (!a) return b || '';
-  return a + (b ? ' ' + b : '');
-}
-
-function extend() {
-  var target = {};
-  for (var i = 0; i < arguments.length; i++) for (var key in arguments[i]) if (hasOwn.call(arguments[i], key)) target[key] = arguments[i][key];
-  return target;
-}
+module.exports = cloneWithProps;
