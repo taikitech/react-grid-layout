@@ -1,6 +1,6 @@
 'use strict';
 var React = require('react');
-var cloneWithProps = require('react-clonewithprops');
+var cloneWithProps = require('./CloneWithProps');
 var utils = require('./utils');
 var Draggable = require('react-draggable');
 var Resizable = require('react-resizable').Resizable;
