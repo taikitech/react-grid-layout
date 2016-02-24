@@ -1,6 +1,6 @@
 {
   "name": "react-grid-layout-stable-15",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A draggable and resizable grid layout with responsive breakpoints, for React.",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "bash build.sh",
     "build-example": "webpack --config webpack-examples.config.js; node ./examples/generate.js",
-    "dev": "echo 'Open http://localhost:4002'; webpack-dev-server --config webpack-dev-server.config.js --hot --progress --colors --port 4002 --content-base .",
+    "dev": "echo 'Open http://localhost:4002'; webpack-dev-server --config webpack-dev-server.config.js --hot --watch --progress --colors --port 4002 --content-base .",
     "prepublish": "npm run build"
   },
   "repository": {
@@ -34,7 +34,7 @@
   "dependencies": {
     "deep-equal": "^1.0.0",
     "object-assign": "^2.0.0",
-    "react-draggable": "woodenconsulting/react-draggable#1.0.5",
+    "react-draggable": "taikitech/react-draggable#1.0.6",
     "react-resizable": "woodenconsulting/react-resizable#1.0.5"
   },
   "devDependencies": {
