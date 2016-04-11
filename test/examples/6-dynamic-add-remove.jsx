@@ -53,7 +53,6 @@ var AddRemoveLayout = React.createClass({
       w: 2,
       h: 2
     }].concat(this.state.items);
-    console.log('adding', 'n' + this.state.newCounter, items);
     
     this.setState({
       // Add a new item. It must have a unique key!
